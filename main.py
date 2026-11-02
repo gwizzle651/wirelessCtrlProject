@@ -4,6 +4,33 @@
 from machine import ADC
 from picozero import Servo, DistanceSensor
 from time import sleep, ticks_us, ticks_diff
+import network
+import usocket as socket
+import secrets
+
+ssid = "placeholder"
+password = "placeholder"
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(ssid, password)
+
+connectionTimeout = 10
+
+while connectionTimeout > 0:
+    if wlan.status() >= 3:
+        break
+    connectionTimeout -= 1
+    print(f"Connection attempts remaining: {connectionTimeout}")
+    sleep(1)
+
+if wlan.status() != 3:
+    raise RuntimeError(f"Failed to establish a network connection to {ssid}")
+else:
+    print("Connetion successful")
+    networkInformation = wlan.ifconfig()
+    print(f"IP address: {networkInformation[0]}")
+
+print(wlan.isconnected())
 
 ##############################
 ###### PINS AND OBJECTS
