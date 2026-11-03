@@ -1,51 +1,44 @@
-###############################
-####### IMPORT LIBRARIES
-###############################
 from machine import ADC
 from picozero import Servo, DistanceSensor
 from time import sleep, ticks_us, ticks_diff
 import network
-import usocket as socket
+import socket
 import secrets
 
+# networking setup
 ssid = "placeholder"
 password = "placeholder"
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-wlan.connect(ssid, password)
+nic = network.WLAN(network.STA_IF)
+nic.active(True)
+nic.connect(ssid, password)
 
 connectionTimeout = 10
 
 while connectionTimeout > 0:
-    if wlan.status() >= 3:
+    if nic.status() == 3:
         break
     connectionTimeout -= 1
     print(f"Connection attempts remaining: {connectionTimeout}")
     sleep(1)
 
-if wlan.status() != 3:
+if nic.status() != 3:
     raise RuntimeError(f"Failed to establish a network connection to {ssid}")
 else:
     print("Connetion successful")
-    networkInformation = wlan.ifconfig()
+    networkInformation = nic.ifconfig()
     print(f"IP address: {networkInformation[0]}")
 
-print(wlan.isconnected())
+print(nic.isconnected())
 
-##############################
-###### PINS AND OBJECTS
-##############################
+'''
+# sensor and actuator setup
 blue_servo = Servo(16, min_pulse_width=0.00055, max_pulse_width=0.0026)
 ds = DistanceSensor(echo=2, trigger=3)
 pot_pin = ADC(26)
 
-#############################
-####### OTHER SETUP STUFF
-#############################
 lastError = 0
 errorSum = 0
 
-# .03
 Kp = .018
 Ki = .01480263158
 Kd = .005472
@@ -66,9 +59,6 @@ while len(buffer) < 3:
 blue_servo.value = servo_base_position
 sleep(1)
 
-#################################
-######## INFINITE LOOP
-#################################
 while True:
     now = ticks_us()
     timeChange = ticks_diff(now, lastTime) / 1000000
@@ -109,4 +99,4 @@ while True:
     print(desired_cart_position, current_cart_position_average, servo_command)
     
     sleep(0.03)
-
+'''
